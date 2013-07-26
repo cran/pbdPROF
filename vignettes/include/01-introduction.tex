@@ -1,0 +1,42 @@
+{\color{red} \bf Warning:}
+The findings and conclusions in this article have not been
+formally disseminated by the U.S. Department of Energy
+and should not be construed to represent any determination or
+policy of University, Agency, and National Laboratory.
+
+This document is written to explain the main
+functions of \pkg{pbdPROF}~\citep{Chen2013pbdPROFpackage}, version 0.1-0.
+Every effort will be made to ensure future versions are consistent with
+these instructions, but features in later versions may not be explained
+in this document.
+
+Information about the functionality of this package,
+and any changes in future versions can be found on website:
+``Programming with Big Data in R'' at
+\url{http://r-pbd.org/}.
+
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+The goal of \pkg{pbdPROF} is to utilize external MPI profiling libraries,
+such as \pkg{fpmpi}~\citep{fpmpi}, \pkg{mpiP}~\citep{mpiP}, or
+\pkg{TAU}~\citep{TAU},
+to profile parallel \proglang{R} code and understand hidden MPI
+communications between processors. The number of communications,
+sizes of messages, times, and types of functions calls all affect program
+performance, and so having these measurements can greatly aid in debugging and 
+algorithm design. These MPI profiling libraries are able to
+hijack calls to MPI functions and then capture the profiling information 
+(as described above), all without disturbing the execution of the original program.
+
+The current main features of \pkg{pbdPROF} include:
+\begin{enumerate}
+\item providing linking information to \proglang{pbdR}~\citep{pbdR2012} and other MPI-using \proglang{R} packages
+\item output profiling information associated with MPI calls,
+\item parsing and summarizing profiling information, and
+\item support several MPI profiling libraries.
+\end{enumerate}
+
+
