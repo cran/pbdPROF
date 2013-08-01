@@ -1,0 +1,20 @@
+### All functions
+exportPattern("^prof\\.[[:alpha:]]+")
+# exportPattern("^parse\\.[[:alpha:]]+")
+
+
+### S3 functions
+export(
+  "read.prof",
+  "plot"
+)
+
+
+### S4 classes and methods
+exportClasses("prof")
+
+exportMethods(
+  "show",
+  "print",
+  "plot"
+)

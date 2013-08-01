@@ -1,0 +1,65 @@
+%\VignetteIndexEntry{pbdPROF-guide}
+
+\documentclass{article}
+\usepackage[margin=1.1in]{geometry}
+
+% Style and settings
+\usepackage[nottoc,numbib,notlof,notlot]{tocbibind}
+\usepackage[authoryear,round]{natbib}
+\usepackage{multirow}
+\input{./include/style}
+
+
+\author{
+\begin{minipage}{6in}
+\centering
+Wei-Chen Chen$^1$, Drew Schmidt$^2$, Gaurav Sehrawat$^3$, Pragneshkumar Patel$^2$, and George Ostrouchov$^{1,2}$\\
+\end{minipage}
+\\
+\\
+$^1$Computer Science and Mathematics Division, \\
+Oak Ridge National Laboratory, \\
+Oak Ridge, TN, USA \\
+\\
+$^2$Remote Data Analysis and Visualization Center\\
+University of Tennessee, \\
+Knoxville, TN, USA \\
+\\
+$^3$Jaypee Institute of Information Technology\\
+Uttar Pradesh, India\\
+%\\
+%\\
+%\today
+}
+\title{Guide to the \pkg{pbdPROF} Package\\[.4cm]}
+
+
+
+\begin{document}
+\maketitle
+\pagenumbering{roman}
+\tableofcontents
+
+\newpage
+\input{./include/00-copyright}
+
+\newpage
+\input{./include/00-acknowledgement}
+
+\newpage
+\bodyheadfoot
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\input{./include/01-introduction}
+\input{./include/02-installation}
+\input{./include/03-testing}
+\input{./include/04-example}
+%\input{./include/05-profiling}
+\input{./include/06-debugging}
+
+\bibliographystyle{./include/jss}
+\bibliography{./include/pbdPROF}
+
+\end{document}
