@@ -10,10 +10,20 @@
 \input{./include/style}
 
 
+\newcommand{\profversion}{0.2-0}
+
+\newcommand{\refsec}[1]{\hyperref[#1]{Section~\ref{#1}}}
+\newcommand{\instdebug}{\hyperref[sec:debug]{Appendix~\ref{sec:debug}}}
+
+\newcounter{problemct}
+\setcounter{problemct}{1}
+\newenvironment{problem}{{\color{red}Problem \arabic{problemct}:}}{\addtocounter{problemct}{1}}
+\newenvironment{solution}{{\color{dkgreen}Solution:}}{\vspace{.8cm}}
+
 \author{
 \begin{minipage}{6in}
 \centering
-Wei-Chen Chen$^1$, Drew Schmidt$^2$, Gaurav Sehrawat$^3$, Pragneshkumar Patel$^2$, and George Ostrouchov$^{1,2}$\\
+Wei-Chen Chen$^1$, Drew Schmidt$^2$, Gaurav Sehrawat$^3$, Pragneshkumar Patel$^2$, George Ostrouchov$^{1,2}$\\
 \end{minipage}
 \\
 \\
@@ -31,8 +41,7 @@ Uttar Pradesh, India\\
 %\\
 %\today
 }
-\title{Guide to the \pkg{pbdPROF} Package\\[.4cm]}
-
+\title{A Quick Guide for the \pkg{pbdPROF} Package {\small (Ver. \profversion)}}
 
 
 \begin{document}
@@ -52,12 +61,17 @@ Uttar Pradesh, India\\
 \setcounter{page}{1}
 \pagestyle{fancy}
 
+\part{Installation}
 \input{./include/01-introduction}
 \input{./include/02-installation}
 \input{./include/03-testing}
+\part{Profiling}
 \input{./include/04-example}
-%\input{./include/05-profiling}
-\input{./include/06-debugging}
+\input{./include/05-profiling}
+% \input{./include/06-plotting}
+\part{Appendix}
+\appendix
+\input{./include/07-debugging}
 
 \bibliographystyle{./include/jss}
 \bibliography{./include/pbdPROF}

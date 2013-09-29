@@ -1,14 +1,7 @@
+import(methods, graphics, grid, ggplot2, gridExtra)
+
 ### All functions
-exportPattern("^prof\\.[[:alpha:]]+")
-# exportPattern("^parse\\.[[:alpha:]]+")
-
-
-### S3 functions
-export(
-  "read.prof",
-  "plot"
-)
-
+#exportPattern("^[[:alpha:]]+")
 
 ### S4 classes and methods
 exportClasses("prof")
@@ -18,3 +11,11 @@ exportMethods(
   "print",
   "plot"
 )
+
+export(
+  read.prof, 
+  autoplot.prof
+)
+
+### S3 methods.
+S3method(autoplot, prof)
