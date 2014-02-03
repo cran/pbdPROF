@@ -8,17 +8,35 @@ dnl Process this file with autoconf to produce a configure script
 AC_INIT(DESCRIPTION)
 
 dnl Determine R_HOME.
-: ${R_HOME=‘R RHOME‘}
+: ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
   echo "could not determine R_HOME"
   exit 1
 fi
+R_SCMD="${R_HOME}/bin/Rscript -e"
 
-dnl One way is to specify both include and lib paths
+
+dnl All AC_ARG_WITH
 AC_ARG_WITH([mpi-include],
             AC_HELP_STRING([--with-mpi-include=INCLUDE_PATH],
                            [location of MPI header files]),
             [mpi_include_path=$withval])
+AC_ARG_WITH([mpi-libpath],
+            AC_HELP_STRING([--with-mpi-libpath=LIB_PATH],
+                           [location of MPI library files]),
+            [mpi_lib_path=$withval])
+AC_ARG_WITH([mpi-type],
+            AC_HELP_STRING([--with-mpi-type=MPI_TYPE],
+                           [type of MPI: OPENMPI, MPICH2, MPICH3, or INTELMPI]),
+            [mpi_type=$withval])
+
+dnl All AC_ARG_ENABLE
+AC_ARG_ENABLE(opa,
+  AC_HELP_STRING([--enable-opa], [Enable opa for MPICH*, default yes.]),
+  [ENABLE_OPA="no"], [ENABLE_OPA="yes"])
+
+
+dnl One way is to specify both include and lib paths
 if test -n "${mpi_include_path}" ; then
   MPI_INCLUDE_PATH="${mpi_include_path}"
   if test ! -f "${MPI_INCLUDE_PATH}/mpi.h" ; then
@@ -34,10 +52,6 @@ else
   fi
 fi
 
-AC_ARG_WITH([mpi-libpath],
-            AC_HELP_STRING([--with-mpi-libpath=LIB_PATH],
-                           [location of MPI library files]),
-            [mpi_lib_path=$withval])
 if test -n "${mpi_lib_path}" ; then
   MPI_LIBPATH="${mpi_lib_path}"
 else
@@ -56,10 +70,6 @@ fi
 
 MPITYPE="UNKNOWN"
 
-AC_ARG_WITH([mpi-type],
-            AC_HELP_STRING([--with-mpi-type=MPI_TYPE],
-                           [type of MPI: OPENMPI, MPICH2, or MPICH3]),
-            [mpi_type=$withval])
 if test -n "${mpi_type}" ; then
   MPITYPE="${mpi_type}"
 else
@@ -79,13 +89,10 @@ fi
 
 
 dnl Check MPI in path.
-AC_CHECK_PROG(MPIRUN, mpirun, mpirun, "F")
-AC_CHECK_PROG(MPIEXEC, mpiexec, mpiexec, "F")
-AC_CHECK_PROG(ORTERUN, orterun, orterun, "F")
 AC_CHECK_PROG(SED, sed, sed, "F")
 AC_CHECK_PROG(MPICC, mpicc, mpicc, "F")
 AC_CHECK_PROG(OMPI_INFO, ompi_info, ompi_info, "F")
-AC_CHECK_PROG(MPICH2VERSION, mpich2version, mpich2version, "F")
+dnl AC_CHECK_PROG(MPICH2VERSION, mpich2version, mpich2version, "F")
 
 
 dnl For OpenMPI
@@ -145,20 +152,25 @@ fi
 
 dnl For MPICH3/MPICH2/MPICH
 if test -z "${MPI_INCLUDE_PATH}" ; then
-#  if test "$MPITYPE" = "UNKNOWN" -o "$MPITYPE" = "MPICH2" ; then
 ### MPICH2 users have to specify --with-mpi-type=MPICH2 to get this.
   if test "$MPITYPE" = "MPICH2" -o "$MPITYPE" = "MPICH" -o "$MPITYPE" = "MPICH3" ; then
-    if test "$SED" != "F" -a "$MPICC" != "F" -a "$MPICH2VERSION" != "F" ; then
-      echo "found sed, mpicc, and mpich2version ..."
+    if test "$SED" != "F" -a "$MPICC" != "F" ; then
+      echo "found sed and mpicc ..."
       TMP_INC="F"
       TMP_LIB="F"
 
       TMP_CMD=`mpicc -show`
       echo ">> TMP_CMD = ${TMP_CMD}"
 
+      dnl check "mpi.h".
       TMP_IFS="${IFS}"; IFS=" "
       for dir in ${TMP_CMD}; do
         dir_inc=`echo ${dir} | sed -e "s/^-I\(.*\)$/\1/"`
+
+        dnl use a different way to test.
+        if test "X${dir_inc}" = "X" ; then
+          dir_inc=`echo ${dir} | sed -e "s/-I\(.*\)/\1/"`
+        fi
 
         echo "checking ${dir_inc} ..."
         if test -f "${dir_inc}/mpi.h" ; then
@@ -169,9 +181,15 @@ if test -z "${MPI_INCLUDE_PATH}" ; then
       done
       IFS="${TMP_IFS}"
 
+      dnl check library.
       TMP_IFS="${IFS}"; IFS=" "
       for dir in ${TMP_CMD}; do
         dir_lib=`echo ${dir} | sed -e "s/^-L\(.*\)$/\1/"`
+
+        dnl use a different way to test.
+        if test "X${dir_lib}" = "X" ; then
+          dir_lib=`echo ${dir} | sed -e "s/-L\(.*\)/\1/"`
+        fi
 
         echo "checking ${dir_lib} ..." 
         if test -f "${dir_lib}/libmpich.so" ; then
@@ -206,7 +224,7 @@ dnl 'Paths not specified'
 if test -z "${MPI_INCLUDE_PATH}" ; then
   dnl Another way is to specify MPI_ROOT, perhaps via --with-mpi
   AC_ARG_WITH(mpi,
-              AC_HELP_STRING([--with-mpi=LIB_PATH],
+              AC_HELP_STRING([--with-mpi=MPI_ROOT],
                              [location of top-level MPI directory]),
               [ if test "${withval}" != "no"; then
                       MPI_ROOT=${withval}
@@ -226,7 +244,8 @@ if test -z "${MPI_INCLUDE_PATH}" ; then
              /usr/lib/mpi/gcc/openmpi \
              /usr/lib64/mpi/gcc/openmpi \
              /usr/lib/mpi/gcc/ompi \
-             /usr/lib64/mpi/gcc/ompi ; do
+             /usr/lib64/mpi/gcc/ompi \
+             /usr/local/mpi/openmpi ; do
       if test -f $d/include/openmpi-i386/mpi.h && test -d $d/lib/openmpi/lib; then
       dnl This is what Fedora 17 had
         echo "I am here $d and it is openmpi"
@@ -397,6 +416,12 @@ if test -z "${MPI_INCLUDE_PATH}" ; then
     elif test -f ${MPI_ROOT}/include/mpich2/mpi.h; then
       echo "Found in ${MPI_ROOT}/include/mpich2"
       MPI_INCLUDE_PATH="${MPI_ROOT}/include/mpich2"
+    elif test -f ${MPI_ROOT}/include/mpich3/mpi.h; then
+      echo "Found in ${MPI_ROOT}/include/mpich3"
+      MPI_INCLUDE_PATH="${MPI_ROOT}/include/mpich3"
+    elif test -f ${MPI_ROOT}/include/mpich/mpi.h; then
+      echo "Found in ${MPI_ROOT}/include/mpich"
+      MPI_INCLUDE_PATH="${MPI_ROOT}/include/mpich"
     elif test -f ${MPI_ROOT}/include/mpi.h; then
       echo "Found in ${MPI_ROOT}/include"
       MPI_INCLUDE_PATH="${MPI_ROOT}/include"		  
@@ -524,16 +549,36 @@ case "$MPITYPE" in
     PKG_LIBS="-L${MPI_LIBPATH} -lmpi -llam ${MPI_LIBS}"
     ;;
   MPICH3)
-    PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl ${MPI_LIBS}"
+    if test "X$ENABLE_OPA" = "Xyes" ; then
+      PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl -lopa ${MPI_LIBS}"
+    else
+      PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl ${MPI_LIBS}"
+    fi
     ;;
   MPICH2)
-    PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl -lopa ${MPI_LIBS}"
+    if test "X$ENABLE_OPA" = "Xyes" ; then
+      PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl -lopa ${MPI_LIBS}"
+    else
+      PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl ${MPI_LIBS}"
+    fi
     ;;
   MPICH)
-    PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl -lopa ${MPI_LIBS}"
+    if test "X$ENABLE_OPA" = "Xyes" ; then
+      PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl -lopa ${MPI_LIBS}"
+    else
+      PKG_LIBS="-L${MPI_LIBPATH} -lmpich -lmpl ${MPI_LIBS}"
+    fi
+    ;;
+  INTELMPI)
+    PKG_LIBS="-L${MPI_LIBPATH} -lmpigf -lmpi -lmpigi ${MPI_LIBS}"
     ;;
   *)
-    AC_MSG_ERROR([Unknown type of mpi: use --with-mpi-type or MPI_TYPE to specify it])
+    dnl suppose MPI_LDFLAGS is provided
+    if test "X${MPI_LDFLAGS}" != "X" ; then
+      PKG_LIBS="${MPI_LDFLAGS} ${MPI_LIBS}"
+    else
+      AC_MSG_ERROR([Unknown type of mpi: use --with-mpi-type or MPI_TYPE to specify it])
+    fi
     ;;
 esac
 
@@ -746,6 +791,7 @@ echo ">> MPI_LIBPATH = ${MPI_LIBPATH}"
 echo ">> MPI_LIBS = ${MPI_LIBS}"
 echo ">> MPI_DEFS = ${MPI_DEFS}"
 echo ">> MPI_INCL2 = ${MPI_INCL2}"
+echo ">> MPI_LDFLAGS = ${MPI_LDFLAGS}"
 echo ">> PKG_CPPFLAGS = ${PKG_CPPFLAGS}"
 echo ">> PKG_LIBS = ${PKG_LIBS}"
 echo " "
@@ -776,6 +822,7 @@ AC_SUBST(MPI_LIBPATH)
 AC_SUBST(MPI_LIBS)
 AC_SUBST(MPI_DEFS)
 AC_SUBST(MPI_INCL2)
+AC_SUBST(MPI_LDFLAGS)
 AC_SUBST(PKG_CPPFLAGS)
 AC_SUBST(PKG_LIBS)
 

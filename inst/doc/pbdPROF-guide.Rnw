@@ -12,7 +12,9 @@
 
 \newcommand{\profversion}{0.2-0}
 
-\newcommand{\refsec}[1]{\hyperref[#1]{Section~\ref{#1}}}
+\newcommand{\secref}[1]{\hyperref[#1]{Section~\ref{#1}}}
+\newcommand{\figref}[1]{\hyperref[#1]{Figure~\ref{#1}}}
+
 \newcommand{\instdebug}{\hyperref[sec:debug]{Appendix~\ref{sec:debug}}}
 
 \newcounter{problemct}
@@ -23,20 +25,24 @@
 \author{
 \begin{minipage}{6in}
 \centering
-Wei-Chen Chen$^1$, Drew Schmidt$^2$, Gaurav Sehrawat$^3$, Pragneshkumar Patel$^2$, George Ostrouchov$^{1,2}$\\
+Wei-Chen Chen$^1$, Drew Schmidt$^2$, Gaurav Sehrawat$^3$, Pragneshkumar Patel$^2$, George Ostrouchov$^{4}$\\
 \end{minipage}
 \\
 \\
-$^1$Computer Science and Mathematics Division, \\
-Oak Ridge National Laboratory, \\
-Oak Ridge, TN, USA \\
+$^1$Department of Ecology and Evolutionary Biology, \\
+University of Tennessee, \\
+Knoxville, TN, USA \\
 \\
-$^2$Remote Data Analysis and Visualization Center\\
+$^2$National Institute for Computational Sciences, \\
 University of Tennessee, \\
 Knoxville, TN, USA \\
 \\
 $^3$Jaypee Institute of Information Technology\\
 Uttar Pradesh, India\\
+\\
+$^4$Computer Science and Mathematics Division, \\
+Oak Ridge National Laboratory, \\
+Oak Ridge, TN, USA \\
 %\\
 %\\
 %\today
